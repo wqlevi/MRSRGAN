@@ -1,8 +1,4 @@
-'''
-- [x] save optmizer.stat_dict as well, refer to pytorch doc!!!  
-- [ ] The WGAN-GP-SR still face gradient vanishing problem, and diverge after 30th epoch 
-- [ ] implement Differentiable augmentation GAN method to improve training
-'''
+
 import numpy as np
 import torch
 import torchvision
@@ -26,10 +22,10 @@ from torch.cuda.amp import autocast
 # set up argparser
 parser = argparse.ArgumentParser()
 parser.add_argument('--batch_size',type=int,default=4)
-parser.add_argument('--path',type=str,default='/ptmp/wangqi/transfer_folder/LS200X_Norm/train_crops')
-parser.add_argument('--val_path',type=str,default='/ptmp/wangqi/transfer_folder/LS200X_Norm/val_crops/crops')
+parser.add_argument('--path',type=str,help='This is the path to your training image crops')
+parser.add_argument('--val_path',type=str,help='This is the path to your validation image crops')
 parser.add_argument('--checkpoint',type=int,default=0)
-parser.add_argument('--model_name',type=str,default='Jupyter_C14')
+parser.add_argument('--model_name',type=str,default='MRSRGAN')
 parser.add_argument('--precision',type=int,default=0,help="if 1 -> Float32Tensor | 0 -> HalfTensor ; dont call 16bit while using autocast()")
 opt = parser.parse_args()
 print(opt)
@@ -56,8 +52,6 @@ optimizer_D = torch.optim.Adam(Dnet.parameters(), lr=.0002, betas=(0.9, .999))
 # ckp
 if not checkpoint == 0:
     ckp = torch.load("saved_models/%s_Crop_%d_%d.pth"%(model_name,checkpoint,2*save_every_iter-1))
-    #checkpoint_model_G = f'../saved_models/{model_name}_generator_{checkpoint}_{len(data)-1}.pth'
-    #checkpoint_model_D = f'../saved_models/{model_name}_discriminator_{checkpoint}_{len(data)-1}.pth'
     Dnet.load_state_dict(ckp['Dnet_state_dict'])
     Gnet.load_state_dict(ckp['Gnet_state_dict'])
     optimizer_D.load_state_dict(ckp['optimizer_D_state_dict'])
@@ -144,7 +138,7 @@ def train_loop(epoch,dataloader,valid,fake,device,writer):
         writer.flush()
         
 if __name__ == '__main__':
-    writer = SummaryWriter(comment=f"{model_name}/WGAN_GP")
+    writer = SummaryWriter(comment=f"{model_name}/MRSRGAN")
     if not checkpoint:
         [m.apply(utils.weights_init) for m in [Dnet,Gnet]]
     for epoch in range(num_epoch): 
