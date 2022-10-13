@@ -16,7 +16,7 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--path",type = str,default='/big_data/qi1/gen_data/')
+parser.add_argument("--path",type = str,default='/path/to/your/data/')
 parser.add_argument("--subj",type=str,default = 'sub-0036')
 parser.add_argument("--scale",type=int,default = 2,help='times of upscale: 1 -> 2x | 2 -> 4x')
 opt = parser.parse_args()
